@@ -1,0 +1,60 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% load humanize %}
+{% block body %}
+{% load crispy_forms_tags %}
+
+  <div class="container py-5 col-md-8">
+    <h2>My Account</h2>
+
+
+    <div class="table-responsive">
+      {% if user.is_authenticated %}
+        <table class="table table-bordered table-hover table-sm">
+          <thead class="bg-dark text-light">
+            <tr>
+              <td>Label</td>
+              <td>Value</td>
+
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+                <td>Your Login username</td>
+                <td>{{ account.username }}</td>
+            </tr>
+            <tr>
+                <td>First Name</td>
+                <td>{{ account.first_name }}</td>
+            </tr>
+            <tr>
+                <td>Last Name</td>
+                <td>{{ account.last_name }}</td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>{{ account.email }}</td>
+            </tr>
+            <tr>
+                <td>Your Last Login</td>
+                <td>{{ account.last_login }}</td>
+            </tr>
+            <tr>
+                <td>Your Last Login</td>
+                <td>{{ account.date_joined }}</td>
+            </tr>
+            {% if account.is_staff %}
+              <tr>
+                  <td>Staff</td>
+                  <td>Yes</td>
+              </tr>
+            {% endif %}
+
+          </tbody>
+
+        </table>
+      {% endif %}
+    </div>
+
+  </div>
+{% endblock %}

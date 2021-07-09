@@ -1,0 +1,75 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% load humanize %}
+{% block body %}
+  <div class="container-fluid py-5 col-md-12">
+    <h2>{{ heading }}</h2>
+    <div class="d-flex flex-row justify-content-start align-items-start flex-wrap p-2 bd-highlight">
+      {% for item in listings %}
+        <div class="card p-2 m-2" style="width: 16rem; height: 32rem;">
+          <div class="border" style="width: 15rem; height: 15rem;">
+            <img class="card-img-top img-fluid" src="{{ item.pic_url }}" alt="{{ item.title }}" style='height: 100%; width: 100%; object-fit: contain;'>
+          </div>
+          <div class="card-body small" >
+            <h6 class="card-title">{{ item.title }}</h6>
+            <p class="card-text">{{ item.short_desc }}</p>
+            {% if item.closed %}
+              <p class="card-text">Bid Closed at $ {{ item.startingprice|intcomma }}</p>
+            {% else %}
+              <p class="card-text">Highest Bid : $ {{ item.startingprice|intcomma }}</p>
+            {% endif %}
+            <a href="{% url 'auctions:view_a_listing' %}?id={{ item.id }}" class="btn btn-light btn-sm stretched-link">See Details</a>
+
+          </div>
+        </div>
+      {% empty %}
+        <div class="alert alert-warning alert-dismissible fade show">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <strong>Sorry!</strong> I can't find any Listings!
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+<!-- ------------------------------------------------------------------- -->
+  {% if listings.has_other_pages %}
+  <div class="container-fluid">
+    <div class="d-flex flex-row justify-content-between align-items-start flex-wrap p-2 bd-highlight">
+
+      <form action="{% url 'auctions:index' %}" method="get">
+        <label for="select_page">Select Page to go to: </label>
+        <select class="form-select form-control-sm bg-light" id="select_page" aria-label="form-select-md example" name="page">
+            <option disabled>Select</option>
+            {% for i in listings.paginator.page_range %}
+              {% if listings.number == i %}
+                <option selected value="{{ i }}">{{ i }}<option>
+              {% else %}
+                <option value="{{ i }}">{{ i }}<option>
+              {% endif %}
+            {% endfor %}
+        </select >
+        <button type="submit" class="btn btn-primary btn-sm">Select</button>
+      </form>
+
+      <ul class="pagination pagination-sm">
+        {% if listings.has_previous %}
+          <li class="page-item"><a  class="page-link" href="?page={{ listings.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+          <li class="page-item disabled"><a  class="page-link" href="?page={{ 1 }}">&laquo;</a></li>
+        {% endif %}
+        {% for i in listings.paginator.page_range %}
+          {% if listings.number == i %}
+            <li  class="page-item active"><a  class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if listings.has_next %}
+          <li class="page-item"><a  class="page-link" href="?page={{ listings.next_page_number }}">&raquo;</a></li>
+        {% else %}
+          <li class="page-item disabled"><a  class="page-link" href="?page={{ listings.num_pages }}">&raquo;</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+
+{% endif %}
+
+{% endblock %}

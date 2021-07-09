@@ -1,0 +1,23 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Encyclopedia Display Content
+{% endblock %}
+
+{% block body %}
+  {% include "encyclopedia/includes/messages.html" %}
+  <h1>
+	{% if search_text == "" %}
+		{{ title }}
+	{% else %}
+		{{ search_text }}
+  {% endif %}
+	</h1>
+
+  <div class="col-lg-9 overflow-auto" style="height: 65%; background-color: #f8f8f8">
+	{% autoescape off %}
+    {{ content }}
+	{% endautoescape %}
+    </div>
+	<a href="{% url 'wiki:edit_page' title %}">Click to Edit This Page</a>
+{% endblock %}

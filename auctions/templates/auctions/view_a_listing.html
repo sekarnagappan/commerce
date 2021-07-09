@@ -1,0 +1,145 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% load humanize %}
+{% block body %}
+  <div class="container-fluid py-5 col-md-12">
+    {% if  user.is_authenticated and winning_bidder.username == user.username and listing.closed %}
+      <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="close">&times;</button>
+          <strong>Congratulations! </strong>You have won the bid for this item.
+      </div>
+      <hr class="mb-1">
+    {% endif %}
+    <h2>{{ heading }}</h2>
+    <div class="d-md-flex flex-row justify-content-start align-items-start flex-wrap p-2 bd-highlight">
+      <div class="imgwidth border">
+        <img class= "img-fluid p-2" src="{{ listing.pic_url }}" alt="{{ listing.title }}" style='height: 100%; width: 100%; object-fit: contain;'>
+      </div>
+      <div class="textwidth p-2">
+        <hr>
+        <h4>{{ listing.title }}</h4>
+        <p class="small">by {{ listing.seller }}</p>
+        <p>
+          <span>Star Rating</span>
+          {% for i in '12345' %}
+            {% if forloop.counter <= star_rating %}
+              <span class="fa fa-star checked"></span>
+            {% else %}
+              <span class="fa fa-star unchecked"></span>
+            {% endif %}
+          {% endfor %}
+          <span>{{ star_rating }} Stars </span>
+          {% if user.is_authenticated and listing.seller.username == user.username %}
+            <span>| No Of Bids: {{ no_of_bids }}</span>
+          {% endif %}
+        </p>
+        <hr>
+        <p>{{ listing.short_desc }}</p>
+        {% if listing.closed %}
+          <p>
+            <span>Bid Closed : $ {{ startingprice|intcomma }}</span>
+            {% if user.is_authenticated  %}
+              <span>| Your Bid: $ {{ your_bid|intcomma }}</span>
+            {% endif %}
+          </p>
+        {% else %}
+          <p>
+            <span>Highest Bid : $ {{ startingprice|intcomma }}</span>
+            {% if user.is_authenticated  %}
+              <span>| Your Bid: $ {{ your_bid|intcomma }}</span>
+            {% endif %}
+          </p>
+        {% endif %}
+        {% if user.is_authenticated %}
+          {% if has_watch %}
+            <a href="{% url 'auctions:remove_watch' %}?id={{ listing.id }}" class="btn btn-outline-primary btn-sm">Remove Watch</a>
+          {% else %}
+            <a href="{% url 'auctions:add_watch' %}?id={{ listing.id }}" class="btn btn-outline-primary btn-sm">Add Watch</a>
+          {% endif %}
+          {% if not listing.closed and listing.seller.username != user.username %}
+            <a href="{% url 'auctions:make_a_bid' %}?id={{ listing.id }}" class="btn btn-outline-primary btn-sm">Make a Bid</a>
+          {% endif %}
+          <a href="{% url 'auctions:post_comment' %}?id={{ listing.id }}" class="btn btn-outline-primary btn-sm">Post Comment</a>
+          {% if listing.seller.username == user.username and not listing.closed %}
+            <a href="{% url 'auctions:close_bidding' %}?id={{ listing.id }}" class="btn btn-outline-primary btn-sm">Close Bidding</a>
+            <a href="{% url 'auctions:amend_a_listing' %}?id={{ listing.id }}" class="btn btn-outline-primary btn-sm">Amend Listing</a>
+          {% endif %}
+        {% endif %}
+        <hr>
+        <p>
+          {% autoescape off %}
+            {{ listing.details }}
+          {% endautoescape %}
+        </p>
+      </div>
+    </div>
+
+    <div class="d-flex flex-row justify-content-start align-items-start flex-wrap p-2 bd-highlight">
+      {% for comment in comments %}
+      <div class="card border-light mb-3" style="width: 100%;">
+        <div class="card-header bg-light border-light"><strong>{{ comment.comment_title }}</strong> by {{ comment.commenting_user }} on {{ comment.comment_ts }}</div>
+        <div class="card-body text-dark">
+          <p class="card-text">{{ comment.comment }}</p>
+        </div>
+        <div class="card-footer bg-transparent border-light">
+          <div>
+            <span>Stars : </span>
+          {% for i in '12345' %}
+            {% if forloop.counter <= comment.rating %}
+              <span class="fa fa-star checked"></span>
+            {% else %}
+              <span class="fa fa-star unchecked"></span>
+            {% endif %}
+          {% endfor %}
+          </div>
+        </div>
+        <hr>
+      </div>
+      {% endfor %}
+
+      {% if comments.has_other_pages %}
+      <div class="container-fluid">
+        <div class="d-flex flex-row justify-content-between align-items-start flex-wrap p-2 bd-highlight">
+
+          <form action="{% url 'auctions:view_a_listing' %}" method="get">
+
+              <input type="hidden" name="id" id="listid" value="{{ listing.id }}">
+
+            <label for="select_page">Select Page to go to: </label>
+            <select class="form-select form-control-sm bg-light" id="select_page" aria-label="form-select-md example" name="page">
+                <option disabled>Select</option>
+                {% for i in comments.paginator.page_range %}
+                  {% if comments.number == i %}
+                    <option selected value="{{ i }}">{{ i }}<option>
+                  {% else %}
+                    <option value="{{ i }}">{{ i }}<option>
+                  {% endif %}
+                {% endfor %}
+            </select >
+            <button type="submit" class="btn btn-primary btn-sm">Select</button>
+          </form>
+
+          <ul class="pagination pagination-sm">
+            {% if comments.has_previous %}
+              <li class="page-item"><a  class="page-link" href="?id={{ listing.id }}&page={{ comments.previous_page_number }}">&laquo;</a></li>
+            {% else %}
+              <li class="page-item disabled"><a  class="page-link" href="?id={{ listing.id }}&page={{ 1 }}">&laquo;</a></li>
+            {% endif %}
+            {% for i in comments.paginator.page_range %}
+              {% if comments.number == i %}
+                <li  class="page-item active"><a  class="page-link" href="?id={{ listing.id }}&page={{ i }}">{{ i }}</a></li>
+              {% endif %}
+            {% endfor %}
+            {% if comments.has_next %}
+              <li class="page-item"><a  class="page-link" href="?id={{ listing.id }}&page={{ comments.next_page_number }}">&raquo;</a></li>
+            {% else %}
+              <li class="page-item disabled"><a  class="page-link" href="?id={{ listing.id }}&page={{ comments.num_pages }}">&raquo;</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+
+    {% endif %}
+    </div>
+  </div>
+  {% endblock %}

@@ -1,0 +1,14 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% load humanize %}
+{% block body %}
+{% load crispy_forms_tags %}
+
+  <div class="container py-5 col-md-8">
+    <h2>Add a Watch</h2>
+    <h4>For list item titled : {{ listing_title }}</h4>
+
+    {% crispy form %}
+
+  </div>
+{% endblock %}

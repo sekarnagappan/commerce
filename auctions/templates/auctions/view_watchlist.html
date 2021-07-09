@@ -1,0 +1,83 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% load humanize %}
+{% block body %}
+<div class="container py-5 col-md-10">
+  <h2>{{ heading }}</h2>
+  <h5>You are watching {{ count }} items.</h5>
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover table-sm">
+      <thead class="bg-dark text-light">
+        <tr>
+          <td>ID</td>
+          <td>Watch Item</td>
+          <td>Date&Time Created</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for watch in watchlist %}
+          <tr style="transform: rotate(0);">
+            <td><a href="{% url 'auctions:view_a_listing' %}?id={{ watch.item.id }}" class="stretched-link" >{{ watch.id }}</a></td>
+            <td>{{ watch.item }}</td>
+            <td>{{ watch.watch_ts }}</td>
+          </tr>
+        {% empty %}
+        <tr>
+          <td> - </td>
+          <td> - </td>
+          <td> - </td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+
+    </table>
+  </div>
+</div>
+
+{% if watchlist.has_other_pages %}
+<div class="container-fluid">
+  <div class="d-flex flex-row justify-content-between align-items-start flex-wrap p-2 bd-highlight">
+    <form action="{% url 'auctions:view_watchlist' %}" method="get">
+      <label for="select_page">Select Page to go to: </label>
+      <select class="form-select form-control-sm bg-light" id="select_page" aria-label="form-select-md example" name="page">
+          <option disabled>Select</option>
+          {% for i in watchlist.paginator.page_range %}
+            {% if watchlist.number == i %}
+              <option selected value="{{ i }}">{{ i }}<option>
+            {% else %}
+              <option value="{{ i }}">{{ i }}<option>
+            {% endif %}
+          {% endfor %}
+      </select >
+      <button type="submit" class="btn btn-primary btn-sm">Select</button>
+    </form>
+
+    <div>
+      <ul class="pagination pagination-sm">
+        {% if watchlist.has_previous %}
+          <li class="page-item"><a  class="page-link" href="?page={{ watchlist.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+          <li class="page-item disabled"><a  class="page-link" href="?page={{ 1 }}">&laquo;</a></li>
+        {% endif %}
+        {% for i in watchlist.paginator.page_range %}
+          {% if watchlist.number == i %}
+            <li  class="page-item active"><a  class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if watchlist.has_next %}
+          <li class="page-item"><a  class="page-link" href="?page={{ watchlist.next_page_number }}">&raquo;</a></li>
+        {% else %}
+          <li class="page-item disabled"><a  class="page-link" href="?page={{ watchlist.num_pages }}">&raquo;</a></li>
+        {% endif %}
+        </ul>
+      </div>
+    </div>
+</div>
+{% endif %}
+
+
+
+
+
+{% endblock %}
