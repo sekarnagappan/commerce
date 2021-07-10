@@ -212,10 +212,12 @@ def view_a_listing(request):
     has_watch = False
     winning_bidder = None
     no_of_bids = 0
+    no_of_ratings = 0
     star_rating = 0
     comments = None
     your_bid = 0
     startingprice = 0
+    categories = []
 
     if request.user.is_authenticated:
         usr = get_object_or_404(User, username=request.user)
@@ -228,8 +230,10 @@ def view_a_listing(request):
     if id is not None:
         listing = get_object_or_404(Listings, pk=id)
         if listing is not None:
-            no_of_bids = len(Bids.objects.all().filter(list_item=listing.id))
-            rating_avg = listing.item_comments.all().aggregate(Avg('rating'))
+            no_of_bids = len(Bids.objects.filter(list_item=listing.id))
+            # If rating is zero, assume no rating given, and not included in average calculatons.
+            no_of_ratings = listing.item_comments.filter(rating__gt = 0).count()
+            rating_avg = listing.item_comments.filter(rating__gt = 0).aggregate(Avg('rating'))
             if rating_avg['rating__avg'] is not None:
                 star_rating = round(rating_avg['rating__avg'])
 
@@ -248,6 +252,10 @@ def view_a_listing(request):
                 if len(Watchlist.objects.all().filter(watcher=usr.id).filter(item=listing.id).filter(suspend_watch=False)) > 0:
                     has_watch = True
 
+            for cat in listing.categories.all():
+                categories.append((cat.id, cat.category),)
+            print(f"Listng categories: {categories}")
+
             comments_list = listing.item_comments.all().order_by('comment_ts').reverse()
             paginator = Paginator(comments_list, 4)
             try:
@@ -262,10 +270,12 @@ def view_a_listing(request):
                         "heading": heading,
                         "has_watch": has_watch,
                         "winning_bidder": winning_bidder,
+                        "no_of_ratings": no_of_ratings,
                         "no_of_bids": no_of_bids,
                         "star_rating": star_rating,
                         "your_bid": decimal.Decimal(your_bid).quantize(decimal.Decimal('.01')),
-                        "startingprice": decimal.Decimal(startingprice).quantize(decimal.Decimal('.01'))
+                        "startingprice": decimal.Decimal(startingprice).quantize(decimal.Decimal('.01')),
+                        "categories": categories
                         }
             return render(request, "auctions/view_a_listing.html", context)
         else:

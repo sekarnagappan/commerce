@@ -30,26 +30,34 @@
           {% endfor %}
           <span>{{ star_rating }} Stars </span>
           {% if user.is_authenticated and listing.seller.username == user.username %}
-            <span>| No Of Bids: {{ no_of_bids }}</span>
+            <span>| No Of Ratings Received: {{ no_of_ratings }}</span>
           {% endif %}
         </p>
         <hr>
         <p>{{ listing.short_desc }}</p>
         {% if listing.closed %}
           <p>
-            <span>Bid Closed : $ {{ startingprice|intcomma }}</span>
+            <span>No of Bids: {{ no_of_bids }} </span>
+            <span>| Bid Closed : $ {{ startingprice|intcomma }} </span>
             {% if user.is_authenticated  %}
               <span>| Your Bid: $ {{ your_bid|intcomma }}</span>
             {% endif %}
           </p>
         {% else %}
           <p>
-            <span>Highest Bid : $ {{ startingprice|intcomma }}</span>
+            <span>No of Bids: {{ no_of_bids }} </span>
+            <span>| Highest Bid : $ {{ startingprice|intcomma }}</span>
             {% if user.is_authenticated  %}
               <span>| Your Bid: $ {{ your_bid|intcomma }}</span>
             {% endif %}
           </p>
         {% endif %}
+        <p>
+          <span>Categories: </span>
+          {% for id, category in categories %}
+            <span><a href="{% url 'auctions:list_by_category' %}?cat={{ id }}">{{ category }}</a>&nbsp &nbsp</span>
+          {% endfor %}
+        </p>
         {% if user.is_authenticated %}
           {% if has_watch %}
             <a href="{% url 'auctions:remove_watch' %}?id={{ listing.id }}" class="btn btn-outline-primary btn-sm">Remove Watch</a>
