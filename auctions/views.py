@@ -33,24 +33,30 @@ def index(request):
     cat = request.GET.get('cat', None)
     usr = request.GET.get('usr', None)
     q   = request.GET.get('q', None)
+    selr = request.GET.get('selr', None)
     page = request.GET.get('page', 1)
 
 
-    if cat is None and usr is None and q is None:
-        heading = "Active Listings"
-        list = Listings.objects.filter(publish=True).order_by('id')
-    elif cat is not None:
+    if cat is not None:
         category = get_object_or_404(Category, pk=cat)
         heading = f"Listings for Category: { category }"
-        list = Listings.objects.all().filter(categories=category.id).order_by('id')
+        list = Listings.objects.filter(categories=category.id).order_by('id')
     elif usr is not None:
         user = get_object_or_404(User, username=request.user)
         heading = f"Listing for User: { user.first_name } { user.last_name }"
-        list = Listings.objects.all().filter(seller=user).order_by('id')
+        list = Listings.objects.filter(seller=user).order_by('id')
     elif q is not None:
         heading = f"Listing results for search: {q}"
         qs = Q(title__icontains=q)|Q(short_desc__icontains=q)|Q(details__icontains=q)
         list = Listings.objects.filter(qs).distinct().order_by('id')
+    elif selr is not None:
+        s = get_object_or_404(User, username=selr)
+        heading = f"Listing results for seller: { s.username }"
+        list = Listings.objects.filter(seller=s).distinct().order_by('id')
+    else:
+        # Cath all, list all listing.
+        heading = "Active Listings"
+        list = Listings.objects.filter(publish=True).order_by('id')
 
     if len(list) > 0:
         for li in list:
