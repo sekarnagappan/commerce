@@ -18,7 +18,7 @@
       <div class="textwidth p-2">
         <hr>
         <h4>{{ listing.title }}</h4>
-        <p class="small">by {{ listing.seller }}</p>
+        <p class="small">by <a href="{% url 'auctions:index' %}?selr={{ listing.seller }}">{{ listing.seller }}</a></p>
         <p>
           <span>Star Rating</span>
           {% for i in '12345' %}

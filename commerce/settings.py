@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -146,6 +147,11 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+GRAPH_MODELS = {
+                'all_applications' : True,
+                'group_models': True
+}
 
 LOGGING = {
     'version': 1,
