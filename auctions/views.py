@@ -221,6 +221,7 @@ def view_a_listing(request):
     no_of_ratings = 0
     star_rating = 0
     comments = None
+    no_of_comments = 0
     your_bid = 0
     startingprice = 0
     categories = []
@@ -263,6 +264,7 @@ def view_a_listing(request):
             print(f"Listng categories: {categories}")
 
             comments_list = listing.item_comments.all().order_by('comment_ts').reverse()
+            no_of_comments = listing.item_comments.all().count()
             paginator = Paginator(comments_list, 4)
             try:
                 comments = paginator.page(page)
@@ -273,6 +275,7 @@ def view_a_listing(request):
 
             context = { "listing": listing,
                         "comments": comments,
+                        "no_of_comments": no_of_comments,
                         "heading": heading,
                         "has_watch": has_watch,
                         "winning_bidder": winning_bidder,
@@ -669,7 +672,7 @@ def remove_watch(request):
 def view_categories(request):
     # The function list all categories 8 items on a page.
     try:
-        categories = Category.objects.order_by("id").all()
+        categories = Category.objects.annotate(Count('listings')).order_by("id")
     except Exception as e:
         logger.error(f"{type(e)} : {e}")
         messages.error(request, "Sorry, I can't find any category!")

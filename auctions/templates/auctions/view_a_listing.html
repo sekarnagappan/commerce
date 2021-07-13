@@ -2,7 +2,7 @@
 {% load static %}
 {% load humanize %}
 {% block body %}
-  <div class="container-fluid py-5 col-md-12">
+  <div class="container-fluid py-2 col-md-12">
     {% if  user.is_authenticated and winning_bidder.username == user.username and listing.closed %}
       <div class="alert alert-success alert-dismissible" role="alert">
         <button type="button" class="close" data-dismiss="alert" aria-label="close">&times;</button>
@@ -13,7 +13,7 @@
     <h2>{{ heading }}</h2>
     <div class="d-md-flex flex-row justify-content-start align-items-start flex-wrap p-2 bd-highlight">
       <div class="imgwidth border">
-        <img class= "img-fluid p-2" src="{{ listing.pic_url }}" alt="{{ listing.title }}" style='height: 100%; width: 100%; object-fit: contain;'>
+        <img class= "img-fluid p-1" src="{{ listing.pic_url }}" alt="{{ listing.title }}" style='height: 90%; width: 100%; object-fit: contain;'>
       </div>
       <div class="textwidth p-2">
         <hr>
@@ -29,9 +29,7 @@
             {% endif %}
           {% endfor %}
           <span>{{ star_rating }} Stars </span>
-          {% if user.is_authenticated and listing.seller.username == user.username %}
-            <span>| No Of Ratings Received: {{ no_of_ratings }}</span>
-          {% endif %}
+          <span>| No Of Ratings Received: {{ no_of_ratings }}</span>
         </p>
         <hr>
         <p>{{ listing.short_desc }}</p>
@@ -81,7 +79,9 @@
         </p>
       </div>
     </div>
-
+    <hr>
+    <h4>Comments <small><small> ({{ no_of_comments }} comments)</small> </small></h4>
+    <hr>
     <div class="d-flex flex-row justify-content-start align-items-start flex-wrap p-2 bd-highlight">
       {% for comment in comments %}
       <div class="card border-light mb-3" style="width: 100%;">

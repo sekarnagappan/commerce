@@ -1,7 +1,7 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-  <div class="container py-5 col-md-10">
+  <div class="container py-2 col-md-10">
     <h2>List of Categories</h2>
     <div class="table-responsive">
       <table class="table table-bordered table-hover table-sm">
@@ -10,6 +10,7 @@
             <td>ID</td>
             <td>Category</td>
             <td>Category Description</td>
+            <td>No Of Items</td>
           </tr>
         </thead>
         <tbody>
@@ -18,9 +19,11 @@
               <td><a href="{% url 'auctions:list_by_category' %}?cat={{ cat.id }}" class="stretched-link">{{ cat.id }}</a></td>
               <td>{{ cat.category }}</td>
               <td>{{ cat.category_desc }}</td>
+              <td>{{ cat.listings__count }}</td>
             </tr>
           {% empty %}
           <tr>
+            <td> - </td>
             <td> - </td>
             <td> - </td>
             <td> - </td>

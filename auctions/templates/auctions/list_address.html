@@ -2,7 +2,7 @@
 {% load static %}
 {% load humanize %}
 {% block body %}
-<div class="container py-5 col-md-10">
+<div class="container py-2 col-md-10">
   <h2>{{ heading }}</h2>
   <h6>You have {{ count }} addresses. <small>Click the row below to amend or delete an address.</small></h6>
   <span><a href ="{% url 'auctions:add_address' %}" class="btn btn-outline-primary btn-sm">Add Address</a></span>
