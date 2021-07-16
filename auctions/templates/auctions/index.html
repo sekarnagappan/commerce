@@ -41,9 +41,9 @@
             <option disabled>Select</option>
             {% for i in listings.paginator.page_range %}
               {% if listings.number == i %}
-                <option selected value="{{ i }}">{{ i }}<option>
+                <option selected value="{{ i }}">{{ i }}</option>
               {% else %}
-                <option value="{{ i }}">{{ i }}<option>
+                <option value="{{ i }}">{{ i }}</option>
               {% endif %}
             {% endfor %}
         </select >

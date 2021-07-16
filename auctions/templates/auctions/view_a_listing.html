@@ -17,7 +17,11 @@
       </div>
       <div class="textwidth p-2">
         <hr>
-        <h4>{{ listing.title }}</h4>
+        <h4><span>{{ listing.title }}</span>
+            {% if listing.closed %}
+            <span class="small">(Bidding Closed)</span>
+            {% endif %}
+        </h4>
         <p class="small">by <a href="{% url 'auctions:index' %}?selr={{ listing.seller }}">{{ listing.seller }}</a></p>
         <p>
           <span>Star Rating</span>
@@ -85,7 +89,10 @@
     <div class="d-flex flex-row justify-content-start align-items-start flex-wrap p-2 bd-highlight">
       {% for comment in comments %}
       <div class="card border-light mb-3" style="width: 100%;">
-        <div class="card-header bg-light border-light"><strong>{{ comment.comment_title }}</strong> by {{ comment.commenting_user }} on {{ comment.comment_ts }}</div>
+        <div class="card-header bg-light border-light">
+            <span class='col-md-3 align-item-start text-left'><strong>{{ comment.comment_title }}</strong> by {{ comment.commenting_user }}</span>
+            <span class='col-md-3 align-item-end text-right'> Date: {{ comment.comment_ts }}</span>
+        </div>
         <div class="card-body text-dark">
           <p class="card-text">{{ comment.comment }}</p>
         </div>
@@ -118,9 +125,9 @@
                 <option disabled>Select</option>
                 {% for i in comments.paginator.page_range %}
                   {% if comments.number == i %}
-                    <option selected value="{{ i }}">{{ i }}<option>
+                    <option selected value="{{ i }}">{{ i }}</option>
                   {% else %}
-                    <option value="{{ i }}">{{ i }}<option>
+                    <option value="{{ i }}">{{ i }}</option>
                   {% endif %}
                 {% endfor %}
             </select >
