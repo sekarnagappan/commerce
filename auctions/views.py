@@ -29,7 +29,7 @@ def index(request):
     #
     # The user need no be logged it to access this function. But the query by user,
     # will return a error if the user is nt logged in.
-
+    
     cat = request.GET.get('cat', None)
     usr = request.GET.get('usr', None)
     q   = request.GET.get('q', None)
