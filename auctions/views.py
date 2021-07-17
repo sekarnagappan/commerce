@@ -29,34 +29,40 @@ def index(request):
     #
     # The user need no be logged it to access this function. But the query by user,
     # will return a error if the user is nt logged in.
-    
-    cat = request.GET.get('cat', None)
-    usr = request.GET.get('usr', None)
-    q   = request.GET.get('q', None)
-    selr = request.GET.get('selr', None)
+
+    cat = request.GET.get('cat', "")
+    usr = request.GET.get('usr', "")
+    q   = request.GET.get('q', "")
+    selr = request.GET.get('selr', "")
     page = request.GET.get('page', 1)
 
+    print(f"cat: {cat} usr: {usr} q: {q} selr: {selr}")
 
-    if cat is not None:
+    if cat != "":
         category = get_object_or_404(Category, pk=cat)
         heading = f"Listings for Category: { category }"
         list = Listings.objects.filter(categories=category.id).order_by('id')
-    elif usr is not None:
+        user_req = f"cat={cat}"
+    elif usr != "":
         user = get_object_or_404(User, username=request.user)
         heading = f"Listing for User: { user.first_name } { user.last_name }"
         list = Listings.objects.filter(seller=user).order_by('id')
-    elif q is not None:
+        user_req = "usr=Y"
+    elif q != "":
         heading = f"Listing results for search: {q}"
         qs = Q(title__icontains=q)|Q(short_desc__icontains=q)|Q(details__icontains=q)
         list = Listings.objects.filter(qs).distinct().order_by('id')
-    elif selr is not None:
+        user_req = f"q={q}"
+    elif selr != "":
         s = get_object_or_404(User, username=selr)
         heading = f"Listing results for seller: { s.username }"
         list = Listings.objects.filter(seller=s).distinct().order_by('id')
+        user_req = f"selr={selr}"
     else:
         # Cath all, list all listing.
         heading = "Active Listings"
         list = Listings.objects.filter(publish=True).order_by('id')
+        user_req ="all=all"
 
     if len(list) > 0:
         for li in list:
@@ -75,7 +81,12 @@ def index(request):
 
     return render(request, "auctions/index.html", {
                                                     "listings": listing,
-                                                    "heading": heading
+                                                    "heading": heading,
+                                                    "user_req": user_req,
+                                                    "cat" : cat,
+                                                    "usr": usr,
+                                                    "q": q,
+                                                    "selr": selr
                                                     })
 
 @login_required
