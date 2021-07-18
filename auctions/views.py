@@ -36,8 +36,6 @@ def index(request):
     selr = request.GET.get('selr', "")
     page = request.GET.get('page', 1)
 
-    print(f"cat: {cat} usr: {usr} q: {q} selr: {selr}")
-
     if cat != "":
         category = get_object_or_404(Category, pk=cat)
         heading = f"Listings for Category: { category }"
@@ -272,7 +270,6 @@ def view_a_listing(request):
 
             for cat in listing.categories.all():
                 categories.append((cat.id, cat.category),)
-            print(f"Listng categories: {categories}")
 
             comments_list = listing.item_comments.all().order_by('comment_ts').reverse()
             no_of_comments = listing.item_comments.all().count()
@@ -340,7 +337,6 @@ def make_a_bid(request):
                 else:
                     messages.error(request, "Your bid must be higher then the current bid!")
             else:
-                print(form.errors)
                 messages.error(request, "There has been an error on the form, please correct and resubmit.")
         else:
             messages.info(request, "No bids has been placed.")
@@ -587,12 +583,13 @@ def add_watch(request):
 
     if request.method == "POST":
         form = CreateWatchForm(request.POST)
+        listing = get_object_or_404(Listings, pk=request.session['item'])
         if 'submit' in request.POST:
             if form.is_valid():
                 watch_form = form.save(commit=False)
                 watch_form.watcher = request.user
                 try:
-                    watch_form.item = Listings.objects.get(pk=request.session['item'])
+                    watch_form.item = listing
                     watch_form.save()
                 except Exception as e:
                     logger.error(f"{type(e)} : {e}")
@@ -600,7 +597,9 @@ def add_watch(request):
                 else:
                     messages.success(request, "Saved: Your watch request has been saved!")
             else:
-                messages.error(request, "Sorry, I am not able to save your watch request!")
+                messages.error(request, "Please correct the error and resubmit!")
+                context = { 'form': form, 'listing_title': listing.title }
+                return render(request, "auctions/add_watch.html", context )
         else:
             messages.info(request, "Cancelled: The watch request has not been saved.")
 
@@ -651,6 +650,8 @@ def remove_watch(request):
                 else:
                     messages.success(request, "Removed: Your watch has been removed!")
             else:
+                #user cannot change anything thing tht has been recorded, so should not error.
+                logger.error(f'Form Error: {form.errors}')
                 messages.error(request, "Sorry, I am not able to remove your watch!")
         else:
             messages.info(request, "Cancelled: The watch request has not been removed.")
@@ -887,7 +888,7 @@ def login_view(request):
             password = form.cleaned_data.get("password")
             user = authenticate(request, username=username, password=password)
             if user is not None:
-                logger.info(f"User {user.id} logging in.")
+                logger.info(f"User {user.id} has logged in.")
                 login(request, user)
                 return HttpResponseRedirect(reverse("auctions:index"))
             else:
@@ -915,7 +916,9 @@ def change_password(request):
     return render(request, "auctions/change_password.html", {'form': form})
 
 def logout_view(request):
+    user_id = request.user.id
     logout(request)
+    logger.info(f"User {user_id} has logged out.")
     return HttpResponseRedirect(reverse("auctions:index"))
 
 
@@ -925,11 +928,12 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            msg = f"You are registered. Your ID is {user.id}"
+            logger.info(f"New user {user.id} has registered.")
+            msg = f"Thank You! You are registered now. Your Login ID is {user}"
             messages.success(request, msg)
             return HttpResponseRedirect(reverse("auctions:index"))
         else:
-            messages.error(request, "Sorry, I am not able to register you!")
+            messages.error(request, "Sorry, I am not able to register you, please correct the erro and resubmit!")
     else:
         form = RegistrationForm
     return render(request, "auctions/register.html", {"form": form })

@@ -214,14 +214,11 @@ class MakeABidForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         max_bidamt = kwargs.pop('max_bidamt', 0)
         bidding_user = kwargs.pop('bidding_user', 0)
-        print(f"max_bid and bidding_user param: {max_bidamt} {bidding_user}")
         super(MakeABidForm, self).__init__(*args, **kwargs)
         self.fields['ship_to'].queryset = Address.objects.filter(shipping_add=True).filter(username=bidding_user)
         self.fields['bill_to'].queryset = Address.objects.filter(billing_add=True).filter(username=bidding_user)
         self.initial['ship_to'] = Address.objects.filter(shipping_add=True).filter(username=bidding_user).filter(default_shipping=True).first()
         self.initial['bill_to'] = Address.objects.filter(billing_add=True).filter(username=bidding_user).filter(default_billing=True).first()
-        print(f"ship default? {self.initial['ship_to']}")
-        print(f"bill default? {self.initial['bill_to']}")
         self.fields['bidamt'].widget.attrs['min'] = max_bidamt
         self.helper = FormHelper()
         self.helper.form_id = 'make_a_bid_form'
