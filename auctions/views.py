@@ -857,22 +857,6 @@ def view_my_account(request):
 
     return HttpResponseRedirect(request.session[request.META.get('HTTP_REFERER', '/')])
 
-
-
-
-
-#
-# Misc functions
-#
-def pics(request, folder, picfile):
-    picpath = "images/" + str(folder) + "/" + picfile
-    context = {
-        "folder" : folder,
-        "picfile" : picfile,
-        "picpath" : picpath
-    }
-    return render(request, "auctions/pics.html", context)
-
 #
 # Logins, Logouts, Register and Change Password.
 #
